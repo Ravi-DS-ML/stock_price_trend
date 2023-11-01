@@ -15,16 +15,15 @@ st.title("Stock Price Trend Prediction")
 
 user_input = st.text_input("Enter Stock Ticker", "AAPL")
 
-# Get the stock data based on the user's input
+# Get the Apple stock data
 data = yf.download(user_input, start=start_date, end=end_date)
 
-# Describe the data
+# Describe data
 st.header(f"Data for {user_input}")
 
 st.write(data.describe())
 
 st.subheader("Closing Price vs Time Chart")
-
 fig = plt.figure(figsize=(12, 6))
 plt.plot(data['Close'])
 st.pyplot(fig)
@@ -40,35 +39,29 @@ plt.legend()
 st.pyplot(fig_ma)
 
 # Splitting the data
-train_data = pd.DataFrame(data['Close'][:int(len(data)) * 0.70])
-test_data = pd.DataFrame(data['Close'][int(len(data) * 0.70):])
+train_data = data.loc[start_date:end_date]['Close']
 
 # Normalize the data using Min-Max scaling
 scaler = MinMaxScaler(feature_range=(0, 1))
-train_data_scaled = scaler.fit_transform(train_data)
-test_data_scaled = scaler.fit_transform(test_data)
+train_data_scaled = scaler.fit_transform(train_data.values.reshape(-1, 1))
 
 # Load the pre-trained model
 model = load_model('keras_model.h5')
 
-# Testing part
-
 # Prepare test data
 past_100_days = train_data.tail(100)
-final_df = pd.concat([past_100_days, test_data], ignore_index=True)
-input_data = scaler.fit_transform(final_df)
+final_df = pd.concat([past_100_days, data['Close']], ignore_index=True)
+input_data = scaler.transform(final_df.values.reshape(-1, 1))
 
 x_test = []
 y_test = []
 
 for i in range(100, input_data.shape[0]):
-    x_test.append(input_data[i - 100:i])
+    x_test.append(input_data[i - 100:i, 0])
     y_test.append(input_data[i, 0])
 x_test, y_test = np.array(x_test), np.array(y_test)
 
 # Predicting the stock price
-
-# Make predictions
 y_predicted = model.predict(x_test)
 
 # Inverse scaling to get actual prices
