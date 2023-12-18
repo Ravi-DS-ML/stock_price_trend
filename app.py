@@ -12,7 +12,7 @@ from tensorflow.keras.models import load_model
 start_date = '2010-01-01'
 end_date = '2023-10-31'
 st.set_page_config(
-    page_title="Dashboard",
+    page_title="Trend Predictor",
     layout='centered'
 )
 # Custom Streamlit styles
