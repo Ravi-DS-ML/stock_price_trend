@@ -13,7 +13,7 @@ start_date = '2010-01-01'
 end_date = '2023-10-31'
 st.set_page_config(
     page_title="Dashboard",
-
+    layout='centered'
 )
 # Custom Streamlit styles
 st.markdown(
